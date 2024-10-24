@@ -18,10 +18,10 @@
  *      check_error(), etc. 
  * 
  * Inputs:
- *    <List of input parameters or signals the program handles, or "None">
+ *    HallEffect, Temperature, Button
  * 
  * Outputs:
- *    <List of output signals or results, or "None">
+ *    data1
  * 
  * Example Application:
  *  During an experiment the Hall effect sensor has contact with a magnet while the temperature 
@@ -30,10 +30,10 @@
  *      for plotting and recording values.
  * 
  * Dependencies:
- *    <Arduino.h>, <ESP8266HTTPClient.h>, 
+ *    <Arduino.h>, <ESP8266HTTPClient.h>, <ESP8266WiFi.h>, <ArduinoJson.h>, <sendRequest.h>
  * 
  * Usage Notes:
- *    <Additional notes about the application or special instructions>
+ *    Final Draft
  * 
  * --------
 */
