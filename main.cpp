@@ -53,8 +53,8 @@
 
     //Wifi log-in
     String theTime;
-    const char* ssid     = "Pokemon Center"; // mst be exactly as it apears - case sensitive
-    const char* password = "SalgadoE";
+    const char* ssid     = "<>"; // mst be exactly as it apears - case sensitive
+    const char* password = "<>";
 
     // Url to get time. API time zones available:
     // https://timeapi.io/documentation/iana-timezones
