@@ -3,8 +3,8 @@
 #include <ESP8266WiFi.h> // Wifi compatible
 
 // Wifi log-in
-const char* ssid     = "Pokemon Center"; // must be exactly as it appears - case sensitive
-const char* password = "SalgadoE";
+const char* ssid     = "<>"; // must be exactly as it appears - case sensitive
+const char* password = "<>";
 
 int Button = 4;  // D2
 int LEDPin = 13; // Pin for LED
