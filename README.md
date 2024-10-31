@@ -1,2 +1,2 @@
 # EE470
-myIOTCode
+Internet of Things - Fall 2024
