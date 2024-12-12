@@ -1,3 +1,6 @@
+// Versions: 
+//  v1: Nov-24-2022 - Cleaned up version 
+//-----------------------------
 //-----------------------------
 // Title: MQTT
 //-----------------------------
@@ -21,8 +24,8 @@
 #include <PubSubClient.h>
 
 // WiFi variables
-const char* ssid = <>;  // Enter your WiFi name
-const char* password = <>;  // Enter WiFi password
+const char* ssid = "Pokemon Center";  // Enter your WiFi name
+const char* password = "SalgadoE";  // Enter WiFi password
 
 // MQTT variables
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -164,6 +167,7 @@ void loop() {
     snprintf(msg, MSG_BUFFER_SIZE, "%d", 1);  // Send "1" as a string
     client.publish(publishTopic, msg);
     Serial.println("Button pressed, sent 1");
+    digitalWrite(LED, HIGH);
     buttonPressTime = millis(); // Start timer
     ledStatus = 1; // Mark that the button press event has occurred
   }
@@ -173,6 +177,7 @@ void loop() {
     snprintf(msg, MSG_BUFFER_SIZE, "%d", 0);  // Send "0" as a string
     client.publish(publishTopic, msg);
     Serial.println("5 seconds passed, sent 0");
+    digitalWrite(LED, LOW);
     ledStatus = 0; // Reset status
   }
 
