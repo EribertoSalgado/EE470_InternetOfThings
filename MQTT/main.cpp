@@ -76,8 +76,8 @@
 #include <PubSubClient.h>
 
 // WiFi variables
-const char* ssid = <>;  // Enter your WiFi name
-const char* password = <>;  // Enter WiFi password
+const char* ssid = "Pokemon Center";  // Enter your WiFi name
+const char* password = "SalgadoE";  // Enter WiFi password
 
 // MQTT variables
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -96,6 +96,7 @@ int ledStatus = 0;
 WiFiClient espClient;
 PubSubClient client(espClient); // define MQTTClient 
 
+const int Potentiometer = A0; // Potentiometer on pin A0
 
 void setup_wifi() {
   delay(10);
@@ -181,6 +182,16 @@ void loop() {
     snprintf (msg, MSG_BUFFER_SIZE, "Number # %d", value); // prints Number # 1, Number # 2, .....
     Serial.print("Publish message: ");
     Serial.println(msg);
-    client.publish(publishTopic, msg);
+    client.publish(publishTopic, msg); // variables published 
+    
+        // Prepare message for potentiometer value
+    int potValue = analogRead(Potentiometer);
+    char potMessage[MSG_BUFFER_SIZE];
+    snprintf(potMessage, MSG_BUFFER_SIZE, "Pot Value: %d", potValue);
+    Serial.print("Publish potentiometer value: ");
+    Serial.println(potMessage);
+    
+    // Publish the potentiometer value
+    client.publish(publishTopic, potMessage); // Send pot value as a string      
   }
 }
