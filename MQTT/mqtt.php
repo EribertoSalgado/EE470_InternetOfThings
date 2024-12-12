@@ -3,10 +3,9 @@ been published from the relay node-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>MQTT Data Insertion</title>
 </head>
 <body>
+
 
 <?php
 $servername = "localhost";
@@ -14,38 +13,40 @@ $username = <>;
 $password = <>;
 $dbname = <>;
 
-// Enable error reporting
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
+    echo "connection error.";
     die("Connection failed: " . $conn->connect_error);
+    
 }
 
-$potValue = $_GET['pot'] ?? null; // Use null coalescing to get 'pot' parameter
 
-if ($potValue) {
-    // Use prepared statement to avoid SQL injection
-    $stmt = $conn->prepare("INSERT INTO `MQTT_Data` (`sensor_value`, `timestamp`) VALUES (?, NOW())");
-    $stmt->bind_param("s", $potValue);
+$potValue = NULL;
 
-    if ($stmt->execute()) {
-        echo "New record created successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
+
+foreach ($_REQUEST as $key => $value)
+{
+    if($key == "pot")
+    {
+        $potValue = $value;
+        //echo $nodeParam;
+        // "<br>";
     }
-    $stmt->close();
-} else {
-    echo "No potentiometer value provided.";
 }
 
-$conn->close();
+
+if (isset($potValue)){
+    $sql = "INSERT INTO `MQTT_Data`(`sensor_value`) VALUES ('" .$potValue . "')";
+
+    $result = $conn->query($sql);
+}
+
 ?>
 
+Text
 </body>
 </html>
+<iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2783435/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=Potentiometer%28V%29%29&type=line"></iframe>
