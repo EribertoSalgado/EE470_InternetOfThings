@@ -10,9 +10,9 @@ been published from the relay node-->
 
 <?php
 $servername = "localhost";
-$username = "u537162232_db_EribertoSal";
-$password = "Erick5100";
-$dbname = "u537162232_EribertoSal";
+$username = <>;
+$password = <>;
+$dbname = <>;
 
 // Enable error reporting
 ini_set('display_errors', 1);
