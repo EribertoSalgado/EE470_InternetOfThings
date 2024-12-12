@@ -76,8 +76,8 @@
 #include <PubSubClient.h>
 
 // WiFi variables
-const char* ssid = "Pokemon Center";  // Enter your WiFi name
-const char* password = "SalgadoE";  // Enter WiFi password
+const char* ssid = <>;  // Enter your WiFi name
+const char* password = <>;  // Enter WiFi password
 
 // MQTT variables
 const char* mqtt_server = "broker.mqtt-dashboard.com";
