@@ -1,4 +1,4 @@
-#relay node that subscribes
+#relay node that subscribes to the broker
 #subscribe to HIVEMQ broker and grab the potentiometer data. Then, oush this 
 #data to Hostinger DB.
 import paho.mqtt.client as mqtt
