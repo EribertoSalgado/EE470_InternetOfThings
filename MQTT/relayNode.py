@@ -5,6 +5,10 @@ import paho.mqtt.client as mqtt
 import requests
 from datetime import datetime
 
+# ThingSpeak settings
+THINGSPEAK_API_KEY = '2MBTA9VLPARRBIDL'  # Replace with your ThingSpeak Write API Key
+THINGSPEAK_URL = f'https://api.thingspeak.com/update?api_key=2MBTA9VLPARRBIDL&field1=0'
+
 # HiveMQ settings
 MQTT_SERVER = "broker.mqtt-dashboard.com"
 MQTT_PORT = 1883
@@ -24,15 +28,16 @@ def on_message(client, userdata, message):
         payload = str(message.payload.decode("utf-8"))
         print(f"Received data: {payload}")
 
-        # Send data to Hostinger database
-        url = "https://lightpink-sheep-430801.hostingersite.com/mqtt.php"
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        params = {
-            "pot": payload,
-            "timestamp": timestamp
-        }
-        response = requests.get(url, params=params)
-        print(f"Database response: {response.status_code}")
+        # Process only messages containing potentiometer data
+        if "Pot Value:" in payload:
+            pot_value = payload.split(":")[1].strip()  # Extract the numeric value
+            print(f"Extracted Potentiometer Value: {pot_value}")
+
+            # Send data to ThingSpeak
+            response = requests.get(f"{THINGSPEAK_URL}&field1={pot_value}")
+            print(f"ThingSpeak response: {response.status_code}")
+        else:
+            print("Message does not contain potentiometer data. Ignoring.")
     except Exception as e:
         print(f"Error processing message: {e}")
 
