@@ -1,58 +1,3 @@
-// #include <Arduino.h>
-
-// // Pins
-// const int Button = 4; // Button on pin D4
-// const int LED = 13;   // LED on pin D13
-// const int Potentiometer = A0; // Potentiometer on pin A0
-
-// // Functions
-// bool check_switch() {
-//   // Return true if the button is pressed (HIGH)
-//   return digitalRead(Button) == HIGH;
-// }
-
-// void setup() {
-//   // Initialize pin modes
-//   pinMode(Button, INPUT);
-//   pinMode(LED, OUTPUT);
-  
-//   // Initialize serial communication
-//   Serial.begin(9600);
-//   Serial.println("System Ready");
-// }
-
-// void loop() {
-//   // Potentiometer value
-//   int potValue = analogRead(Potentiometer);
-//   float voltage = potValue * (5.0 / 1023.0); // Convert to voltage
-//   Serial.print("Potentiometer Value: ");
-//   Serial.print(potValue);
-//   Serial.print(" (Voltage: ");
-//   Serial.print(voltage);
-//   Serial.println(" V)");
-
-//   // LED control
-//   Serial.println("Turn LED ON (1) or OFF (0):");
-//   while (!Serial.available()); // Wait for user input
-//   int userLED = Serial.parseInt();
-//   if (userLED == 1) {
-//     digitalWrite(LED, HIGH);
-//     Serial.println("LED is ON");
-//   } else {
-//     digitalWrite(LED, LOW);
-//     Serial.println("LED is OFF");
-//   }
-
-//   // Check switch state
-//   if (check_switch()) {
-//     Serial.println("Button Pressed");
-//   } else {
-//     Serial.println("Button Not Pressed");
-//   }
-
-//   delay(1000); // Delay for readability
-// }
-
 //-----------------------------
 // Title: MQTT
 //-----------------------------
@@ -76,27 +21,33 @@
 #include <PubSubClient.h>
 
 // WiFi variables
-const char* ssid = <>;  // Enter your WiFi name
-const char* password = <>;  // Enter WiFi password
+const char* ssid = "Pokemon Center";  // Enter your WiFi name
+const char* password = "SalgadoE";  // Enter WiFi password
 
 // MQTT variables
 const char* mqtt_server = "broker.mqtt-dashboard.com";
-const char* publishTopic = "testtopic/temp/outTopic/eriberto";   // outTopic where ESP publishes
+const char* publishTopic = "testtopic/temp/outTopic/eriberto";  // Replace xxx with your unique code
 const char* subscribeTopic = "testtopic/temp/inTopic/eriberto";  // inTopic where ESP has subscribed to
 #define publishTimeInterval 10000 // in seconds 
 
 // Definitions 
 unsigned long lastMsg = 0;
-#define MSG_BUFFER_SIZE	(50)
+#define MSG_BUFFER_SIZE (50)
+const int LED = 13;  // LED on pin D7
+const int Potentiometer = A0; // Potentiometer on pin A0
+const int Button = 4; // Button on pin D4
 #define BUILTIN_LED 2 // built-in LED
 char msg[MSG_BUFFER_SIZE];
 int value = 0;
 int ledStatus = 0;
 
+const int debounceTime = 50; // milliseconds
+int lastButtonState = HIGH; // Initial state assumed HIGH (not pressed)
+int currentButtonState;
+unsigned long buttonPressTime = 0; // Time when button was pressed
+
 WiFiClient espClient;
 PubSubClient client(espClient); // define MQTTClient 
-
-const int Potentiometer = A0; // Potentiometer on pin A0
 
 void setup_wifi() {
   delay(10);
@@ -120,21 +71,28 @@ void setup_wifi() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 }
-  //------------------------------------------
 
+//------------------------------------------
+//Receives published topic subscribed
 void callback(char* topic, byte* payload, int length) {
-  Serial.print("Message arrived ["); // Received the incoming message
+  Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
+
   for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);  // the received value is in (char)payload[i]
+    Serial.print((char)payload[i]);
+    if (payload[i] == '1') {
+      digitalWrite(LED, HIGH);
+      Serial.println("LED turned ON");
+    } else if (payload[i] == '0') {
+      digitalWrite(LED, LOW);
+      Serial.println("LED turned OFF");
+    }
   }
   Serial.println();
-  // Switch on the LED if an 1 was received as first character
-  // add your code here
-
 }
-  //------------------------------------------
+
+//------------------------------------------
 
 void reconnect() {
   // Loop until we're reconnected
@@ -147,7 +105,7 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // ... and resubscribe
-      //client.subscribe(subscribeTopic);
+      client.subscribe(subscribeTopic);
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -157,41 +115,67 @@ void reconnect() {
     }
   }
 }
- //------------------------------------------
+
+//------------------------------------------
 
 void setup() {
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  pinMode(LED, OUTPUT);
+  pinMode(Button, INPUT);
   Serial.begin(9600);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 }
+
 //------------------------------------------
 void loop() {
-
   if (!client.connected()) {
-    reconnect(); // check for the latest value in inTopic 
+    reconnect(); // Check for the latest value in inTopic
   }
   client.loop();
 
-// Publish to outTopic 
-  unsigned long now = millis(); 
+  // Publish to outTopic
+  unsigned long now = millis();
   if (now - lastMsg > publishTimeInterval) {
     lastMsg = now;
     ++value;
-    snprintf (msg, MSG_BUFFER_SIZE, "Number # %d", value); // prints Number # 1, Number # 2, .....
+    snprintf(msg, MSG_BUFFER_SIZE, "Number # %d", value); // prints Number # 1, Number # 2, .....
     Serial.print("Publish message: ");
     Serial.println(msg);
-    client.publish(publishTopic, msg); // variables published 
-    
-        // Prepare message for potentiometer value
+    client.publish(publishTopic, msg); // Variables published
+
+    // Prepare message for potentiometer value
     int potValue = analogRead(Potentiometer);
+    float voltage = potValue * (5.0 / 1023.0); // Convert to voltage
     char potMessage[MSG_BUFFER_SIZE];
-    snprintf(potMessage, MSG_BUFFER_SIZE, "Pot Value: %d", potValue);
+    snprintf(potMessage, MSG_BUFFER_SIZE, "Pot Value: %f", voltage);
     Serial.print("Publish potentiometer value: ");
     Serial.println(potMessage);
-    
+
     // Publish the potentiometer value
-    client.publish(publishTopic, potMessage); // Send pot value as a string      
+    client.publish(publishTopic, potMessage); // Send pot value as a string      
   }
+
+  // Button handling
+  currentButtonState = digitalRead(Button);
+
+  if (currentButtonState == LOW && lastButtonState == HIGH) {
+    // Button pressed (state changed from HIGH to LOW)
+    snprintf(msg, MSG_BUFFER_SIZE, "%d", 1);  // Send "1" as a string
+    client.publish(publishTopic, msg);
+    Serial.println("Button pressed, sent 1");
+    buttonPressTime = millis(); // Start timer
+    ledStatus = 1; // Mark that the button press event has occurred
+  }
+
+  if (ledStatus == 1 && millis() - buttonPressTime >= 5000) {
+    // 5 seconds have passed since button press
+    snprintf(msg, MSG_BUFFER_SIZE, "%d", 0);  // Send "0" as a string
+    client.publish(publishTopic, msg);
+    Serial.println("5 seconds passed, sent 0");
+    ledStatus = 0; // Reset status
+  }
+
+  // Update the lastButtonState to detect changes
+  lastButtonState = currentButtonState;
 }
