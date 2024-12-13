@@ -1,6 +1,3 @@
-// Versions: 
-//  v1: Nov-24-2022 - Cleaned up version 
-//-----------------------------
 //-----------------------------
 // Title: MQTT
 //-----------------------------
@@ -24,8 +21,8 @@
 #include <PubSubClient.h>
 
 // WiFi variables
-const char* ssid = "Pokemon Center";  // Enter your WiFi name
-const char* password = "SalgadoE";  // Enter WiFi password
+const char* ssid = <>;  // Enter your WiFi name
+const char* password = "Ramirez510";  // Enter WiFi password
 
 // MQTT variables
 const char* mqtt_server = "broker.mqtt-dashboard.com";
@@ -183,4 +180,5 @@ void loop() {
 
   // Update the lastButtonState to detect changes
   lastButtonState = currentButtonState;
+}
 }
