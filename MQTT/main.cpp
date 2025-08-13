@@ -22,7 +22,7 @@
 
 // WiFi variables
 const char* ssid = <>;  // Enter your WiFi name
-const char* password = "Ramirez510";  // Enter WiFi password
+const char* password = "";  // Enter WiFi password
 
 // MQTT variables
 const char* mqtt_server = "broker.mqtt-dashboard.com";
